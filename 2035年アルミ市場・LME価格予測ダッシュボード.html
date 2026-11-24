@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="dashboard">
+  <meta name="design-style" content="briefing">
+  <title>2035年アルミニウム市場・LME価格長期予測エクスプローラー</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces: warm stone-white paper */
+      --background: #faf9f5;
+      --surface-container-low: #ffffff;
+      --surface-container: #f1efe8;
+      --surface-container-high: #e6e2d6;
+
+      /* Ink */
+      --on-surface: #17181a;
+      --on-surface-variant: #56585c;
+
+      /* Rules */
+      --outline: #17181a;
+      --outline-variant: #dedad0;
+      --button-outline: #c8c4b8;
+
+      /* Accents */
+      --primary: #17181a;
+      --on-primary: #faf9f5;
+      --primary-container: #f2b705;
+      --on-primary-container: #17181a;
+      --secondary: #1f4e5f;
+      --tertiary: #785008;
+      --error: #b42318;
+      --on-error: #ffffff;
+
+      /* Semantic & Soft Tints */
+      --positive: #2b6e52;
+      --warning: #d99000;
+      --focus: #1f4e5f;
+      --tag-gold-bg: #f5e6c4;
+      --positive-bg: #e6f2ec;
+      --error-bg: #fbeae8;
+      --secondary-bg: #e7eff2;
+      --band-fill: rgba(31, 78, 95, 0.11);
+      --gold-band-fill: rgba(217, 144, 0, 0.16);
+
+      /* Data series */
+      --data-1: #1f4e5f;
+      --data-2: #d99000;
+      --data-3: #2b6e52;
+      --data-4: #b84a39;
+      --data-5: #5a6778;
+      --data-context: #c4bfb2;
+
+      /* Fonts */
+      --font-headline: 'Noto Serif JP', 'Source Serif 4', serif;
+      --font-body: 'Noto Sans JP', 'Plus Jakarta Sans', sans-serif;
+      --font-label: 'Geist Mono', 'Noto Sans JP', monospace;
+
+      /* Shape */
+      --rounded: 0.25rem;
+      --rounded-lg: 0.375rem;
+      --rounded-full: 0.25rem;
+
+      /* Style effects */
+      --section-rule: 1.5px solid var(--outline);
+      --card-border: 1px solid var(--outline-variant);
+      --badge-radius: 2px;
+      --heading-tracking: -0.02em;
+      --label-tracking: 0.08em;
+
+      /* Dashboard Type Scale */
+      --display-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.35rem);
+      --headline-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.55rem);
+      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Spacing Scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+    button, input, select, textarea { font-family: inherit; }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-xl);
+      padding: var(--space-lg);
+      max-width: 1240px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Dossier Header & Section Bar */
+    .dossier-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      border-bottom: var(--section-rule);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .dossier-bar-left {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .dossier-pill {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.6875rem;
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      padding: 0.1875rem 0.55rem;
+      border-radius: var(--badge-radius);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .dossier-meta {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      letter-spacing: 0;
+    }
+
+    .title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 700;
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.15;
+      color: var(--on-surface);
+      margin: 0;
+    }
+    .standfirst {
+      font-family: var(--font-body);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      color: var(--secondary);
+      margin: var(--space-sm) 0 0 0;
+      max-width: 70ch;
+      line-height: 1.5;
+    }
+
+    .section-heading {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .section-deck {
+      margin: var(--space-xs) 0 var(--space-md) 0;
+      color: var(--on-surface-variant);
+      max-width: 72ch;
+      font-size: var(--body-size);
+    }
+
+    /* Quick Navigation Jump Strip */
+    .jump-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      padding-top: var(--space-md);
+      margin-top: var(--space-md);
+      border-top: var(--card-border);
+    }
+    .jump-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .jump-link:hover {
+      background: var(--surface-container);
+      border-color: var(--secondary);
+    }
+    .index-num {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      color: var(--secondary);
+    }
+
+    /* KPI Summary Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .figure-card {
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-xs);
+    }
+    .kpi-label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+    }
+    .figure-card .value {
+      font-family: var(--font-headline);
+      font-size: clamp(1.375rem, 1.15rem + 0.8vw, 1.85rem);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums lining-nums;
+      color: var(--on-surface);
+      line-height: 1.2;
+    }
+    .kpi-sub {
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+      line-height: 1.45;
+    }
+    .kpi-tag {
+      display: inline-block;
+      align-self: flex-start;
+      margin-top: auto;
+      padding: 0.125rem 0.5rem;
+      font-size: var(--label-size);
+      font-weight: 600;
+      border-radius: var(--rounded);
+      background: var(--tag-gold-bg);
+      color: var(--tertiary);
+    }
+    .kpi-tag.positive {
+      background: var(--positive-bg);
+      color: var(--positive);
+    }
+    .kpi-tag.slate {
+      background: var(--secondary-bg);
+      color: var(--secondary);
+    }
+
+    /* Two-column Asymmetric Layouts */
+    .split-grid-wide {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .split-grid-equal {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .card-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+
+    /* Interactive Control Bars & Buttons */
+    .control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded);
+      border: 1px solid var(--button-outline);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .btn:hover {
+      background: var(--surface-container);
+      border-color: var(--on-surface);
+    }
+    .btn.active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .btn-secondary.active {
+      background: var(--secondary);
+      color: var(--on-primary);
+      border-color: var(--secondary);
+    }
+    .btn-gold {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: var(--primary-container);
+    }
+
+    /* Chart Container */
+    .chart-title {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 700;
+      margin: 0 0 var(--space-xs) 0;
+      color: var(--on-surface);
+    }
+    .chart-subtitle {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      margin: 0 0 var(--space-md) 0;
+    }
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      min-height: 330px;
+      height: 350px;
+    }
+    .chart-wrap.tall {
+      min-height: 360px;
+      height: 380px;
+    }
+    .chart-wrap.compact {
+      min-height: 270px;
+      height: 280px;
+    }
+    .chart-source {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      margin-top: var(--space-sm);
+      padding-top: var(--space-xs);
+      border-top: var(--card-border);
+    }
+
+    /* Aside / Methodology Callouts */
+    .aside-box {
+      background: var(--surface-container);
+      border-top: var(--section-rule);
+      padding: var(--space-md);
+      border-radius: 0 0 var(--rounded-lg) var(--rounded-lg);
+    }
+    .aside-box h4 {
+      margin: 0 0 var(--space-xs) 0;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--on-surface);
+    }
+    .aside-box p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      line-height: 1.55;
+    }
+
+    /* Year Inspector Panel */
+    .inspector-card {
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .year-badge {
+      font-family: var(--font-label);
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+    input[type="range"] {
+      width: 100%;
+      min-height: 44px;
+      accent-color: var(--secondary);
+      cursor: pointer;
+    }
+    .metric-list {
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid var(--outline-variant);
+      gap: var(--space-sm);
+    }
+    .metric-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .metric-name {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+    }
+    .metric-val {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--on-surface);
+      text-align: right;
+    }
+    .metric-val.highlight {
+      color: var(--tertiary);
+    }
+
+    /* Data Tables */
+    .table-scroll {
+      overflow-x: auto;
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      background: var(--surface-container-low);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data-table thead th {
+      background: var(--surface-container);
+      color: var(--on-surface);
+      font-family: var(--font-label);
+      font-weight: 600;
+      text-align: right;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--section-rule);
+      white-space: nowrap;
+    }
+    table.data-table thead th:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      background: var(--surface-container);
+      z-index: 1;
+    }
+    table.data-table tbody td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--outline-variant);
+      text-align: right;
+      font-family: var(--font-label);
+      white-space: nowrap;
+    }
+    table.data-table tbody td:first-child {
+      text-align: left;
+      font-family: var(--font-body);
+      font-weight: 600;
+      position: sticky;
+      left: 0;
+      background: var(--surface-container-low);
+    }
+    table.data-table tbody tr {
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    table.data-table tbody tr:hover {
+      background: var(--surface-container);
+    }
+    table.data-table tbody tr.selected-row {
+      background: var(--tag-gold-bg);
+    }
+    table.data-table tbody tr.selected-row td:first-child {
+      background: var(--tag-gold-bg);
+    }
+
+    /* Sector Selector Cards */
+    .sector-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .sector-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-xs);
+      padding: var(--space-md);
+      min-height: 44px;
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      text-align: left;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    }
+    .sector-btn:hover {
+      background: var(--surface-container);
+    }
+    .sector-btn.active {
+      background: var(--secondary-bg);
+      box-shadow: inset 0 0 0 2px var(--secondary);
+    }
+    .sector-btn-title {
+      font-weight: 700;
+      font-size: 0.9375rem;
+      color: var(--on-surface);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .sector-btn-stat {
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    /* EV / Gigacast Interactive Simulator */
+    .simulator-box {
+      background: var(--surface-container);
+      border-top: var(--section-rule);
+      padding: var(--space-md) var(--space-lg);
+      border-radius: 0 0 var(--rounded-lg) var(--rounded-lg);
+      display: grid;
+      gap: var(--space-md);
+    }
+    .sim-inputs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+    .input-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .input-field label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+    .number-input {
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid var(--button-outline);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      font-family: var(--font-label);
+      font-size: 0.9375rem;
+      color: var(--on-surface);
+      width: 100%;
+    }
+    .sim-result-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+    }
+    .sim-big-num {
+      font-family: var(--font-headline);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Progress / Comparison Bars */
+    .bar-stack {
+      display: grid;
+      gap: var(--space-md);
+    }
+    .bar-item {
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      gap: var(--space-sm);
+    }
+    .bar-track {
+      height: 12px;
+      background: var(--surface-container);
+      border-radius: var(--badge-radius);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--data-1);
+      border-radius: var(--badge-radius);
+    }
+    .bar-fill.green { background: var(--data-3); }
+    .bar-fill.gold { background: var(--data-2); }
+    .bar-fill.red { background: var(--data-4); }
+
+    /* Bull / Bear Factor Grid */
+    .factor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .factor-card {
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      border-left: 4px solid var(--secondary);
+    }
+    .factor-card.bull { border-left-color: var(--positive); }
+    .factor-card.bear { border-left-color: var(--error); }
+    .factor-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      flex-wrap: wrap;
+    }
+    .polarity-badge {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--badge-radius);
+    }
+    .polarity-badge.bull {
+      background: var(--positive-bg);
+      color: var(--positive);
+    }
+    .polarity-badge.bear {
+      background: var(--error-bg);
+      color: var(--error);
+    }
+    .cat-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+      background: var(--surface-container);
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--badge-radius);
+    }
+    .factor-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .factor-body {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      margin: 0;
+      line-height: 1.55;
+    }
+    .factor-stat {
+      margin-top: auto;
+      padding-top: var(--space-xs);
+      border-top: var(--card-border);
+      font-family: var(--font-label);
+      font-size: 0.78rem;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    /* Geopolitical SVG Diagram Card */
+    .geo-svg-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .geo-svg-wrap svg {
+      width: 100%;
+      min-width: 560px;
+      height: auto;
+      display: block;
+    }
+
+    /* Details / Expandable Table */
+    details.data-drawer {
+      margin-top: var(--space-md);
+    }
+    details.data-drawer summary {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      background: var(--surface-container);
+      border: var(--card-border);
+      border-radius: var(--rounded);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.875rem;
+      list-style: none;
+    }
+    details.data-drawer summary:hover {
+      background: var(--surface-container-high);
+    }
+    details.data-drawer[open] summary {
+      margin-bottom: var(--space-md);
+    }
+
+    /* Footer */
+    .sources-footer {
+      border-top: var(--section-rule);
+      padding-top: var(--space-lg);
+      margin-top: var(--space-md);
+      color: var(--on-surface-variant);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+    }
+    .sources-footer strong {
+      color: var(--on-surface);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 920px) {
+      .split-grid-wide,
+      .split-grid-equal,
+      .card-grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .page-grid {
+        grid-template-columns: 1fr;
+        padding: var(--space-md);
+        gap: var(--space-lg);
+      }
+      .sector-grid,
+      .sim-inputs {
+        grid-template-columns: 1fr;
+      }
+      .chart-wrap {
+        min-height: 280px;
+        height: 290px;
+      }
+      .chart-wrap.tall {
+        min-height: 300px;
+        height: 310px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+
+    <!-- HEADER / BRIEFING DOSSIER -->
+    <header>
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">BRIEFING 2035</span>
+          <span class="dossier-meta">IRUNIVERSE / MIRU 長期予測レポート要旨 ・ 2024年2月29日基準</span>
+        </div>
+        <span class="dossier-meta">HORIZON: 2020–2035</span>
+      </div>
+      <h1 class="title">2035年アルミニウム市場・LME価格長期展望</h1>
+      <p class="standfirst">
+        1トン 2,200ドルをベースラインとする底堅い相場と、グリーンプレミアム10倍化・再生地金主導の需給再編・重要鉱物囲い込みが交錯する過渡期の10年
+      </p>
+
+      <nav class="jump-nav" aria-label="セクション移動">
+        <a class="jump-link" href="#forecast"><span class="index-num">01</span>価格・プレミアム予測</a>
+        <a class="jump-link" href="#supply-demand"><span class="index-num">02</span>需給バランス・再生地金</a>
+        <a class="jump-link" href="#demand-drivers"><span class="index-num">03</span>EV・再エネ・部門別需要</a>
+        <a class="jump-link" href="#green-energy"><span class="index-num">04</span>脱炭素・電源転換・人口動態</a>
+        <a class="jump-link" href="#bull-bear"><span class="index-num">05</span>強弱材料・地政学マトリクス</a>
+      </nav>
+    </header>
+
+    <!-- EXECUTIVE SUMMARY 5 KEY TAKEAWAYS -->
+    <section aria-label="レポートの5大要約">
+      <div class="kpi-grid">
+        <article class="figure-card">
+          <div class="kpi-top">
+            <span class="index-num">01</span>
+            <span class="kpi-label">LME価格長期ベースライン</span>
+          </div>
+          <div class="value">$2,200<span style="font-size:0.9rem;font-weight:500;"> /t〜</span></div>
+          <div class="kpi-sub">2035年に向け平均 $2,200台を起点に上振れリスク含み（予測表2035年平均 $3,100）。ただし2004年以降の年平均で $3,000 超の年はなく上振れ余地は限定的。</div>
+          <span class="kpi-tag">ボラティリティは銅より小</span>
+        </article>
+
+        <article class="figure-card">
+          <div class="kpi-top">
+            <span class="index-num">02</span>
+            <span class="kpi-label">2035年 世界需給規模</span>
+          </div>
+          <div class="value">1億2,800万t</div>
+          <div class="kpi-sub">2030年に1億2,000万tラインを突破（IEA）。再生地金シェアは2022年 36% → 2035年 44%（5,632万t）へ拡大し、新地金は約7,168万tでほぼ横ばい。</div>
+          <span class="kpi-tag positive">再生地金が市場を主導</span>
+        </article>
+
+        <article class="figure-card">
+          <div class="kpi-top">
+            <span class="index-num">03</span>
+            <span class="kpi-label">グリーンプレミアム（2035年）</span>
+          </div>
+          <div class="value">$230–240<span style="font-size:0.9rem;font-weight:500;"> /t</span></div>
+          <div class="kpi-sub">2024年足元（$20–30/t）の約10倍水準へ急拡大。Scope1・2でGHG 4t未満の基準化やEU CBAM・スクラップ不足による加算が波及。</div>
+          <span class="kpi-tag">2024年比 約10倍</span>
+        </article>
+
+        <article class="figure-card">
+          <div class="kpi-top">
+            <span class="index-num">04</span>
+            <span class="kpi-label">製錬電源の脱石炭シフト</span>
+          </div>
+          <div class="value">石炭56% → 再エネ</div>
+          <div class="kpi-sub">2023年の製錬電源は石炭56%・水力32%・ガス9%。中国石炭発電は2050年へ半減軌道。水力から太陽光（EGA社等）への転換が進行。</div>
+          <span class="kpi-tag slate">再生材はCO2 96%削減</span>
+        </article>
+
+        <article class="figure-card">
+          <div class="kpi-top">
+            <span class="index-num">05</span>
+            <span class="kpi-label">市場牽引役の交代</span>
+          </div>
+          <div class="value">中国 → 南部諸国</div>
+          <div class="kpi-sub">中国は人口オーナス顕在化で2030年頃に需要ピーク（5,300万t横ばい）。以降はインド、インドネシア、アフリカ等グローバルサウスが牽引。</div>
+          <span class="kpi-tag slate">2050年新興国シェア22%</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECTION 01: LME PRICE & PREMIUM FORECAST -->
+    <section id="forecast">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">01 FORECAST</span>
+          <span class="dossier-meta">LME相場・原材料・地域別＆グリーンプレミアム（2020–2035）</span>
+        </div>
+      </div>
+      <h2 class="section-heading">LME価格・原材料・各種プレミアム長期予測エクスプローラー</h2>
+      <p class="section-deck">
+        世界的な供給余力によりLME本体の急騰は抑えられる一方、地域別プレミアムやグリーンアルミ・プレミアムの上昇が取引コスト構造を塗り替えます。指標を切り替えて2035年までの軌道を検証できます。
+      </p>
+
+      <div class="control-bar" role="group" aria-label="価格チャートの指標切替">
+        <button type="button" class="btn active" id="btn-chart-lme" onclick="setPriceChartMode('lme')">LMEアルミ価格（高値・平均・安値）</button>
+        <button type="button" class="btn" id="btn-chart-green" onclick="setPriceChartMode('green')">グリーンプレミアム（10倍化）</button>
+        <button type="button" class="btn" id="btn-chart-region" onclick="setPriceChartMode('region')">地域別 新地金プレミアム（欧・日・米）</button>
+        <button type="button" class="btn" id="btn-chart-raw" onclick="setPriceChartMode('raw')">原料市況（アルミナ・ボーキサイト）</button>
+        <button type="button" class="btn" id="btn-chart-copper" onclick="setPriceChartMode('copper')">過去20年：アルミ vs 銅（2004–2023）</button>
+      </div>
+
+      <div class="split-grid-wide">
+        <div class="figure-card">
+          <h3 class="chart-title" id="price-chart-title">LMEアルミ相場推移と2035年予測レンジ</h3>
+          <p class="chart-subtitle" id="price-chart-sub">単位: USD/ton ｜ 2020–2023年実績、2024–2035年予測（高値・平均・安値）</p>
+          <div class="chart-wrap tall">
+            <canvas id="priceForecastChart"></canvas>
+          </div>
+          <div class="chart-source" id="price-chart-source">
+            出典: IRUNIVERSE / MIRU「2035年市況予測一覧表」（2024年2月）
+          </div>
+        </div>
+
+        <div class="inspector-card">
+          <div class="slider-group">
+            <div class="slider-label-row">
+              <label for="year-slider">年次データ・インスペクター</label>
+              <span class="year-badge" id="inspector-year-label">2035年（予測）</span>
+            </div>
+            <input type="range" id="year-slider" min="0" max="15" value="15" oninput="updateYearInspector(this.value)">
+            <div style="display:flex;justify-content:space-between;font-family:var(--font-label);font-size:0.75rem;color:var(--on-surface-variant);">
+              <span>2020年</span>
+              <span>2024年（基準）</span>
+              <span>2030年</span>
+              <span>2035年</span>
+            </div>
+          </div>
+
+          <div class="metric-list" id="inspector-metrics">
+            <div class="metric-row">
+              <span class="metric-name">LME相場（平均 / 高値–安値）</span>
+              <span class="metric-val" id="val-lme">$3,100 ($2,900–$3,300)</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">グリーンプレミアム</span>
+              <span class="metric-val highlight" id="val-green">$230–240 /t</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">新地金プレミアム（欧州）</span>
+              <span class="metric-val" id="val-eu">$328 /t</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">新地金プレミアム（米国）</span>
+              <span class="metric-val" id="val-us">29 cents/lb</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">新地金プレミアム（日本）</span>
+              <span class="metric-val" id="val-jp">$135 /t</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">アルミナ（豪州FOB）</span>
+              <span class="metric-val" id="val-alumina">$362.8 /t</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">ボーキサイト（ギニア産対中）</span>
+              <span class="metric-val" id="val-bauxite">$64.6 /dt</span>
+            </div>
+          </div>
+
+          <div class="aside-box">
+            <h4>価格予測の前提ロジック</h4>
+            <p id="inspector-note">
+              ボーキサイトは年平均+1%の上昇前提。新地金需要の伸びが鈍いため原料・LMEの急騰は限定的だが、紛争・流通網の分断やスクラップ不足により地域・グリーンプレミアムが押し上げられます。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <details class="data-drawer">
+        <summary>
+          <i data-lucide="table" style="width:16px;height:16px;" aria-hidden="true"></i>
+          2020–2035年 予測データ一覧表を表示（行クリックで年次インスペクター連動）
+        </summary>
+        <div class="table-scroll">
+          <table class="data-table" id="forecast-table">
+            <thead>
+              <tr>
+                <th>項目 / 単位</th>
+                <th>2020</th><th>2021</th><th>2022</th><th>2023</th>
+                <th>2024</th><th>2025</th><th>2026</th><th>2027</th>
+                <th>2028</th><th>2029</th><th>2030</th><th>2031</th>
+                <th>2032</th><th>2033</th><th>2034</th><th>2035</th>
+              </tr>
+            </thead>
+            <tbody id="forecast-table-body"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- SECTION 02: SUPPLY-DEMAND BALANCE & RECYCLING -->
+    <section id="supply-demand">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">02 SUPPLY &amp; RECYCLING</span>
+          <span class="dossier-meta">世界需給バランス・再生地金シフト・中国集中構造</span>
+        </div>
+      </div>
+      <h2 class="section-heading">「新地金から再生地金へ」— 需給1.28億トン時代と生産構造</h2>
+      <p class="section-deck">
+        数字上の世界需給は2030年・2050年ともに50万〜500万トン規模の「供給超過」が見込まれます。しかし成長分の大半はスクラップ由来の再生地金が担い、新地金生産は中国59%依存という偏在構造を抱えます。
+      </p>
+
+      <div class="split-grid-equal">
+        <!-- Left Chart: IEA / Institutions / 2023 Primary Share -->
+        <div class="figure-card">
+          <div class="control-bar" style="margin-bottom:var(--space-sm);">
+            <button type="button" class="btn btn-secondary active" id="btn-sd-iea" onclick="setSupplyChartMode('iea')">IEA生産予測（新地金 vs 再生）</button>
+            <button type="button" class="btn btn-secondary" id="btn-sd-inst" onclick="setSupplyChartMode('inst')">4機関の需給予測比較</button>
+            <button type="button" class="btn btn-secondary" id="btn-sd-prod" onclick="setSupplyChartMode('prod')">2023年 新地金生産シェア</button>
+          </div>
+          <h3 class="chart-title" id="sd-chart-title">IEA アルミニウム生産予測（新地金と再生地金の内訳）</h3>
+          <p class="chart-subtitle" id="sd-chart-sub">単位: 百万トン ｜ 再生地金シェアは2022年 36% → 2035年 44% → 2050年 56%へ拡大</p>
+          <div class="chart-wrap">
+            <canvas id="supplyDemandChart"></canvas>
+          </div>
+          <div class="chart-source" id="sd-chart-source">
+            出典: IEA「Net Zero Roadmap 2023 Update」を基にMIRU作成（対照: IAI 2030年需要1億1,950万t、日本アルミ協 2050年需要1億4,077万t）
+          </div>
+        </div>
+
+        <!-- Right Chart: Scrap Circulation & Bauxite Reserves -->
+        <div class="figure-card">
+          <div class="control-bar" style="margin-bottom:var(--space-sm);">
+            <button type="button" class="btn btn-secondary active" id="btn-res-scrap" onclick="setResourceChartMode('scrap')">主要国スクラップ流通量（2022→2030）</button>
+            <button type="button" class="btn btn-secondary" id="btn-res-bauxite" onclick="setResourceChartMode('bauxite')">ボーキサイト埋蔵量・生産（USGS）</button>
+          </div>
+          <h3 class="chart-title" id="res-chart-title">世界のアルミスクラップ推定流通量（年間ベース）</h3>
+          <p class="chart-subtitle" id="res-chart-sub">単位: 万トン ｜ 中国はCAGR 10.5%で1,500万tへ急拡大、アフリカも4倍増</p>
+          <div class="chart-wrap">
+            <canvas id="resourceChart"></canvas>
+          </div>
+          <div class="chart-source" id="res-chart-source">
+            出典: MIRUヒヤリング・調査（世界リサイクル市場全体は2022年 3,310万t → 2030年 5,680万t、CAGR 7%見通し）
+          </div>
+        </div>
+      </div>
+
+      <div class="card-grid-3" style="margin-top:var(--space-md);">
+        <div class="aside-box">
+          <h4>新地金ベース vs 現実市場</h4>
+          <p>2023年の世界新地金需給は供給7,036.7万t・需要7,015.3万t（+21.4万tの微供給超、中国は-93.1万tの供給不足）。再生地金を加えた実市場はその約1.4倍（1億トン超）規模です。</p>
+        </div>
+        <div class="aside-box">
+          <h4>使用済み製品の回収余地</h4>
+          <p>IAIの循環フローによると、使用済みアルミ製品回収量8,700万tに対しリサイクル率は25%（2,220万t、2021年）。地球上の自動車15〜16億台はいずれスクラップとなり、長期的には鉛（供給70%再生）に近づきます。</p>
+        </div>
+        <div class="aside-box">
+          <h4>豪産業科学資源省の2028年見通し</h4>
+          <p>2022年→2028年で世界需要は9,400万t→1億1,200万t、供給は1億200万t→1億2,200万tへ。新地金が10%台前半の伸びにとどまる一方、再生地金は需給とも30%超（供給4,450万t・シェア37%）へ急伸します。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 03: DEMAND BY SECTOR & EV/RENEWABLE IMPACT -->
+    <section id="demand-drivers">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">03 DEMAND DRIVERS</span>
+          <span class="dossier-meta">産業セクター別需要推移（2020–2035）とEVギガキャスト試算</span>
+        </div>
+      </div>
+      <h2 class="section-heading">EV・再エネが牽引する産業セクター別需要と2035年軌道</h2>
+      <p class="section-deck">
+        IAIは2020→2030年の需要増（+3,330万トン）の75%を輸送・電気・建設・包装の4部門が占めると予測。自動車は軽量化・ギガキャスト化で最大セクターを維持し、電力は太陽光発電の急拡大が牽引します。
+      </p>
+
+      <div class="split-grid-wide">
+        <div class="figure-card">
+          <h3 class="chart-title">主要4セクター別 世界アルミ需要動向（2020–2035年）</h3>
+          <p class="chart-subtitle">単位: 千トン ｜ 自動車・電力が成長を牽引、建設は2026年以降年率3%で再拡大</p>
+          <div class="chart-wrap tall">
+            <canvas id="sectorDemandChart"></canvas>
+          </div>
+          <div class="chart-source">
+            出典: 業界関連団体資料を基にMIRU試算作成（2020–2035年推移）
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+          <div class="sector-grid" role="group" aria-label="需要セクターの詳細選択">
+            <button type="button" class="sector-btn active" id="sec-btn-auto" onclick="selectSector('auto')">
+              <span class="sector-btn-title"><i data-lucide="car" style="width:16px;height:16px;" aria-hidden="true"></i>自動車（EV化）</span>
+              <span class="sector-btn-stat">2035年: 2,212万t (+49%)</span>
+            </button>
+            <button type="button" class="sector-btn" id="sec-btn-power" onclick="selectSector('power')">
+              <span class="sector-btn-title"><i data-lucide="sun" style="width:16px;height:16px;" aria-hidden="true"></i>電力・再エネ</span>
+              <span class="sector-btn-stat">2035年: 1,706万t (+103%)</span>
+            </button>
+            <button type="button" class="sector-btn" id="sec-btn-const" onclick="selectSector('const')">
+              <span class="sector-btn-title"><i data-lucide="building-2" style="width:16px;height:16px;" aria-hidden="true"></i>建設・インフラ</span>
+              <span class="sector-btn-stat">2035年: 1,887万t (+20%)</span>
+            </button>
+            <button type="button" class="sector-btn" id="sec-btn-pack" onclick="selectSector('pack')">
+              <span class="sector-btn-title"><i data-lucide="package" style="width:16px;height:16px;" aria-hidden="true"></i>容器包装（脱プラ）</span>
+              <span class="sector-btn-stat">2035年: 763万t (+46%)</span>
+            </button>
+          </div>
+
+          <div class="figure-card" id="sector-detail-panel">
+            <div class="kpi-top">
+              <span class="index-num" id="sector-badge">SECTOR 01</span>
+              <span class="kpi-label" id="sector-growth-tag">2020→2035年: 14,830 → 22,122千トン</span>
+            </div>
+            <h3 class="chart-title" id="sector-detail-title" style="margin-top:var(--space-xs);">自動車：EV・ギガキャストが鉄鋼からの代替を加速</h3>
+            <p style="font-size:0.875rem;margin:0;color:var(--on-surface-variant);line-height:1.6;" id="sector-detail-body">
+              車1台当たりのアルミ使用量は2020年の170kgから2030年には250kgへ増加見通し。ギガキャスト導入車種では1台当たり150〜250kg追加され最大450kgに達します。豪産業科学資源省はEV販売台数が2022年1,070万台→2028年3,000万台、EV用アルミ使用量が270万t→760万tへ拡大すると試算。一方、先進国の人口減少や中国・EUのEV補助金終了・HEV（ハイブリッド）回帰による一時的踊り場にも留意が必要です。
+            </p>
+          </div>
+
+          <!-- Interactive Auto Aluminum Simulator -->
+          <div class="simulator-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-xs);">
+              <strong style="font-size:0.9375rem;">自動車アルミ需要・ギガキャスト試算シミュレーター</strong>
+              <span class="dossier-meta">前提検証ツール</span>
+            </div>
+            <div class="control-bar" style="margin-bottom:0;">
+              <button type="button" class="btn" onclick="applyAutoPreset(6720, 170)">2020年基準 (170kg)</button>
+              <button type="button" class="btn" onclick="applyAutoPreset(7000, 250)">2030年予測 (250kg)</button>
+              <button type="button" class="btn" onclick="applyAutoPreset(7000, 300)">レポート標準 (300kg)</button>
+              <button type="button" class="btn" onclick="applyAutoPreset(7000, 450)">ギガキャスト上限 (450kg)</button>
+            </div>
+            <div class="sim-inputs">
+              <div class="input-field">
+                <label for="input-auto-sales">世界自動車販売台数（万台）</label>
+                <input type="number" id="input-auto-sales" class="number-input" value="7000" min="4000" max="10000" step="100" oninput="syncAutoFromNumber()">
+              </div>
+              <div class="input-field">
+                <label for="input-auto-kg">1台当たりアルミ使用量（kg）</label>
+                <input type="number" id="input-auto-kg" class="number-input" value="300" min="100" max="550" step="10" oninput="syncAutoFromNumber()">
+              </div>
+            </div>
+            <div class="sim-result-strip">
+              <div>
+                <div style="font-size:0.75rem;color:var(--on-surface-variant);font-weight:600;">試算 年間アルミ需要量</div>
+                <div class="sim-big-num" id="sim-auto-output">2,100万トン</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:0.75rem;color:var(--on-surface-variant);">2023年自動車需要（1,810万t）比</div>
+                <div style="font-family:var(--font-label);font-weight:600;color:var(--positive);" id="sim-auto-delta">+290万トン (+16.0%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 04: DECARBONIZATION, POWER TRANSITION & DEMOGRAPHICS -->
+    <section id="green-energy">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">04 GREEN &amp; DEMOGRAPHICS</span>
+          <span class="dossier-meta">電源転換・CO2削減・規制枠組み・人口オーナス</span>
+        </div>
+      </div>
+      <h2 class="section-heading">グリーンアルミ化・電源転換と成長市場に迫る「人口オーナス」</h2>
+      <p class="section-deck">
+        環境負荷型金属の汚名を返上すべく石炭火力から水力・太陽光・再生材への転換が加速する一方、東アジアの急速な高齢化が2030年以降の市場地図をグローバルサウスへ塗り替えます。
+      </p>
+
+      <div class="card-grid-3">
+        <!-- Panel 1: Power Mix & Coal Phase-down -->
+        <article class="figure-card">
+          <span class="index-num">POWER MIX</span>
+          <h3 class="chart-title">アルミ製錬の電源構成と脱石炭</h3>
+          <p class="chart-subtitle">2023年 製錬電源構成（6,967万tベース）</p>
+          <div class="chart-wrap compact">
+            <canvas id="powerMixChart"></canvas>
+          </div>
+          <div class="bar-stack" style="margin-top:var(--space-sm);">
+            <div class="bar-item">
+              <div class="bar-header"><span>中国の石炭発電（2022年実績）</span><strong>5,536 TWh</strong></div>
+              <div class="bar-track"><div class="bar-fill red" style="width:100%;"></div></div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-header"><span>2030年 STEPS見通し</span><strong>4,662 TWh (-16%)</strong></div>
+              <div class="bar-track"><div class="bar-fill gold" style="width:84%;"></div></div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-header"><span>2050年 STEPS見通し</span><strong>2,213 TWh (-60%)</strong></div>
+              <div class="bar-track"><div class="bar-fill green" style="width:40%;"></div></div>
+            </div>
+          </div>
+          <div class="chart-source">出典: 丸紅資料等を基にMIRU作成 / IEA WEO 2023</div>
+        </article>
+
+        <!-- Panel 2: CO2 Intensity & Green Policy -->
+        <article class="figure-card">
+          <span class="index-num">GHG INTENSITY</span>
+          <h3 class="chart-title">製造時CO2負荷の比較（経産省データ）</h3>
+          <p class="chart-subtitle">単位: kg-CO2 / kg-Al ｜ 再生材活用で排出量を96%削減</p>
+          <div class="bar-stack" style="margin-top:var(--space-sm);">
+            <div class="bar-item">
+              <div class="bar-header"><span>現行製錬法（石炭等・合計）</span><strong>11.02 kg</strong></div>
+              <div class="bar-track"><div class="bar-fill red" style="width:100%;"></div></div>
+              <div style="font-size:0.75rem;color:var(--on-surface-variant);">採掘0.05 + アルミナ1.99 + 電解電力以外2.80 + 電解電力6.18</div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-header"><span>グリーンアルミ基準目安（GHG合計）</span><strong>&lt; 8.00 kg</strong></div>
+              <div class="bar-track"><div class="bar-fill gold" style="width:72.6%;"></div></div>
+              <div style="font-size:0.75rem;color:var(--on-surface-variant);">実質基準はScope1+2ベースで4t/t未満へ厳格化</div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-header"><span>再エネ利用・新地金（不活性電極等）</span><strong>低炭素製錬</strong></div>
+              <div class="bar-track"><div class="bar-fill" style="width:26%;"></div></div>
+              <div style="font-size:0.75rem;color:var(--on-surface-variant);">EGA社が太陽光アルミを伊藤忠経由で神戸製鋼へ納入開始</div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-header"><span>資源循環・再生地金（再生工程）</span><strong>0.45 kg (-96%)</strong></div>
+              <div class="bar-track"><div class="bar-fill green" style="width:4.1%;"></div></div>
+              <div style="font-size:0.75rem;color:var(--on-surface-variant);">IEAベースでは再生地金CO2負荷は新地金の1/30（0.309t）</div>
+            </div>
+          </div>
+          <div class="aside-box" style="margin-top:auto;">
+            <h4>調達ルールが価格差を固定化</h4>
+            <p>米First Movers Coalition（55社参画）、EU CBAM（2026年課税開始）、仏EV環境スコア（最大7,000ユーロ補助）により、グリーンアルミ未対応企業は市場退出リスクに直面します。</p>
+          </div>
+        </article>
+
+        <!-- Panel 3: Aging & Global South Shift -->
+        <article class="figure-card">
+          <span class="index-num">DEMOGRAPHICS</span>
+          <h3 class="chart-title">人口オーナスと牽引地域の交代</h3>
+          <p class="chart-subtitle">高齢化速度とアルミ消費シェアの長期的シフト</p>
+          <p style="font-size:0.875rem;color:var(--on-surface-variant);margin:0 0 var(--space-sm) 0;">
+            東アジア諸国やタイ・ベトナムなどASEANの一部では、1人当たりGDPが十分に高まる前に高齢者比率が成長の重荷となる「人口オーナス期」へ急速に移行しています。
+          </p>
+          <div class="metric-list">
+            <div class="metric-row">
+              <span class="metric-name">中国（需要ピーク予測）</span>
+              <span class="metric-val">2030年頃 5,300万t横ばい</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">アジア（日中除く）・アフリカ等シェア</span>
+              <span class="metric-val highlight">15% (2017) → 22% (2050)</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">インド 2023年アルミ需要</span>
+              <span class="metric-val">前年比 +17.4%（2026年 240万t）</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">インド・インドネシア・比</span>
+              <span class="metric-val">人口ボーナス維持の成長例外圏</span>
+            </div>
+          </div>
+          <div class="aside-box" style="margin-top:auto;">
+            <h4>インドの純輸出減とアセアン増産</h4>
+            <p>インドは新地金生産400万t超（2026年450万t見込）の純輸出国ですが、国内のEV・再エネ・建設需要の急増で輸出余力は縮小。一方、インドネシアでは中国資本主導で50万t級製錬所が相次ぎ新設予定です。</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECTION 05: BULL / BEAR FACTORS & GEOPOLITICS -->
+    <section id="bull-bear">
+      <div class="dossier-bar">
+        <div class="dossier-bar-left">
+          <span class="dossier-pill">05 BULL / BEAR &amp; GEOPOLITICS</span>
+          <span class="dossier-meta">市況の強弱11材料と経済安全保障ブロック化</span>
+        </div>
+      </div>
+      <h2 class="section-heading">市況の強弱材料マトリクスと地政学・資源ナショナリズム</h2>
+      <p class="section-deck">
+        ファンダメンタルズ（供給超過）だけでは測れないのが2035年までの過渡期相場です。強材料（6項目）・弱材料（5項目）をフィルタリングして、各材料の市場インパクトを検証できます。
+      </p>
+
+      <!-- Tri-polar Geopolitical Supply Chain Diagram (Briefing Vector Schematic) -->
+      <div class="figure-card" style="margin-bottom:var(--space-lg);">
+        <h3 class="chart-title">分断するアルミ・サプライチェーンの構図（欧米ブロック vs 中華圏・資源国）</h3>
+        <p class="chart-subtitle">重要鉱物指定・域内囲い込み・ロシア制裁がもたらす流通の歪みとプレミアム上昇メカニズム</p>
+        <div class="geo-svg-wrap">
+          <svg viewBox="0 0 920 270" role="img" aria-label="欧米の重要鉱物囲い込みブロックと中華圏・資源国のサプライチェーン対抗構図" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="8" width="275" height="254" rx="6" fill="var(--secondary-bg)" stroke="var(--secondary)" stroke-width="1.5"/>
+            <text x="24" y="34" font-family="var(--font-label)" font-size="11" font-weight="600" fill="var(--secondary)">WESTERN BLOC / 欧米の囲い込み</text>
+            <text x="24" y="58" font-family="var(--font-headline)" font-size="16" font-weight="700" fill="var(--on-surface)">米・EU（重要鉱物指定）</text>
+            <text x="24" y="84" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• 米国：IRA税額控除 / 重要鉱物指定</text>
+            <text x="24" y="106" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• 米国中西部P1020Aプレミアム ~$420/t</text>
+            <text x="24" y="128" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• EU：重要原材料法（域内加工40%・</text>
+            <text x="34" y="146" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">リサイクル25%・単一国依存65%以下）</text>
+            <text x="24" y="168" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• EU：廃棄物輸送規則改正（スクラップ流出制限）</text>
+            <text x="24" y="190" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• IPEFサプライチェーン協定（14カ国, 2024/2発効）</text>
+            <rect x="24" y="210" width="243" height="36" rx="4" fill="var(--surface-container-low)" stroke="var(--secondary)" stroke-width="1"/>
+            <text x="34" y="232" font-family="var(--font-label)" font-size="11" font-weight="600" fill="var(--secondary)">帰結: 一度域内に入った資源は域外へ出ない</text>
+
+            <rect x="322" y="26" width="276" height="218" rx="6" fill="var(--tag-gold-bg)" stroke="var(--tertiary)" stroke-width="1.5"/>
+            <text x="338" y="52" font-family="var(--font-label)" font-size="11" font-weight="600" fill="var(--tertiary)">FRICTION &amp; BOTTLENECK / 市場への波及</text>
+            <text x="338" y="76" font-family="var(--font-headline)" font-size="16" font-weight="700" fill="var(--on-surface)">目詰まりと地域プレミアム高騰</text>
+            <text x="338" y="104" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• ロシア産回避でLME倉庫のロシア比率 76%</text>
+            <text x="338" y="126" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• キャンセルワラント比率 40%超（銅は18%）</text>
+            <text x="338" y="148" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• 紅海危機・海運高騰による物流途絶リスク</text>
+            <text x="338" y="170" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• 投機筋の鞘取り（コンタンゴ裁定）参入余地</text>
+            <rect x="338" y="192" width="244" height="36" rx="4" fill="var(--primary-container)"/>
+            <text x="348" y="214" font-family="var(--font-label)" font-size="11" font-weight="700" fill="var(--on-primary-container)">LMEベース$2,200 + 上振れ＆プレミアム上昇</text>
+
+            <rect x="637" y="8" width="275" height="254" rx="6" fill="var(--surface-container)" stroke="var(--outline)" stroke-width="1.5"/>
+            <text x="653" y="34" font-family="var(--font-label)" font-size="11" font-weight="600" fill="var(--on-surface)">CHINA + RESOURCE NATIONS / 対抗軸</text>
+            <text x="653" y="58" font-family="var(--font-headline)" font-size="16" font-weight="700" fill="var(--on-surface)">中国（生産59%）× 資源国</text>
+            <text x="653" y="84" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• 国内生産上限4,500万t接近（2025年4,300万t）</text>
+            <text x="653" y="106" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• インドネシアボーキサイト禁輸（2023/6）</text>
+            <text x="653" y="128" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">→ 中国資本がインドネシア川下製錬所へ進出</text>
+            <text x="653" y="150" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• ギニア対中公的債務30%・輸入の56%依存</text>
+            <text x="653" y="172" font-family="var(--font-body)" font-size="12" fill="var(--on-surface)">• ロシア産新地金の対中輸入シェア 5.8%→83%</text>
+            <rect x="653" y="210" width="243" height="36" rx="4" fill="var(--surface-container-low)" stroke="var(--outline)" stroke-width="1"/>
+            <text x="663" y="232" font-family="var(--font-label)" font-size="11" font-weight="600" fill="var(--on-surface)">帰結: ニッケル同様のASEAN供給増リスクも</text>
+
+            <line x1="283" y1="135" x2="318" y2="135" stroke="var(--secondary)" stroke-width="2" marker-end="url(#arrow-slate)"/>
+            <line x1="637" y1="135" x2="602" y2="135" stroke="var(--outline)" stroke-width="2" marker-end="url(#arrow-ink)"/>
+            <defs>
+              <marker id="arrow-slate" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="var(--secondary)"/>
+              </marker>
+              <marker id="arrow-ink" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="var(--outline)"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Interactive Filters for Bull/Bear Matrix -->
+      <div class="control-bar" role="group" aria-label="強弱材料フィルター">
+        <button type="button" class="btn active" id="flt-all" onclick="setFactorFilter('all', currentCategory)">すべて (11)</button>
+        <button type="button" class="btn" id="flt-bull" onclick="setFactorFilter('bull', currentCategory)">強材料・上振れ (6)</button>
+        <button type="button" class="btn" id="flt-bear" onclick="setFactorFilter('bear', currentCategory)">弱材料・抑制 (5)</button>
+        <span style="width:1px;height:28px;background:var(--outline-variant);margin:0 var(--space-xs);" aria-hidden="true"></span>
+        <button type="button" class="btn btn-secondary active" id="cat-all" onclick="setFactorFilter(currentPolarity, 'all')">全カテゴリ</button>
+        <button type="button" class="btn btn-secondary" id="cat-demand" onclick="setFactorFilter(currentPolarity, '需給・脱炭素')">需給・脱炭素</button>
+        <button type="button" class="btn btn-secondary" id="cat-geo" onclick="setFactorFilter(currentPolarity, '地政学・規制')">地政学・規制</button>
+        <button type="button" class="btn btn-secondary" id="cat-macro" onclick="setFactorFilter(currentPolarity, 'マクロ・政治')">マクロ・政治</button>
+      </div>
+
+      <div class="factor-grid" id="factor-grid"></div>
+    </section>
+
+    <!-- SOURCES FOOTER -->
+    <footer class="sources-footer">
+      <strong>出典・引用資料（すべてレポート本文・巻末資料に基づく）:</strong><br>
+      IRUNIVERSE / MIRU「アルミ長期予測リポート 2035年への歩み」（2024年2月29日）／ USGS（Mineral Commodity Summaries 2023）／ IAI（Primary Aluminium Production, Opportunities for aluminium in a post Covid economy 2022, Global Aluminium Cycle 2021）／ IEA（Net Zero Roadmap 2023 Update, World Energy Outlook 2023）／ 一般社団法人日本アルミニウム協会（アルミニウム VISION 2050）／ オーストラリア産業科学資源省（Resources and Energy Quarterly 2023）／ 丸紅株式会社（アルミニウム市況見通し 2023年12月）／ 経済産業省（グリーン成長戦略, エネルギー白書2023, IPEF概要）／ 環境省／ 世界銀行（International Debt Report 2023）／ 公益財団法人国際通貨研究所（人口動態と経済成長）／ JOGMEC／ ACEA／ EU（Critical Raw Materials Study 2023）。
+    </footer>
+  </div>
+
+  <script>
+    // Initialize Lucide icons safely
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+
+    // Helper: read CSS token safely
+    function getToken(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    // =========================================================================
+    // DATA: 2020-2035 FORECAST TABLE (p.47)
+    // =========================================================================
+    const forecastYears = [
+      2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027,
+      2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035
+    ];
+    const forecastData = {
+      bauxite: [46.9, 50.4, 65.5, 68.6, 57.9, 58.5, 59.1, 59.7, 60.3, 60.9, 61.5, 62.1, 62.7, 63.4, 64.0, 64.6],
+      alumina: [269.7, 329.3, 359.4, 343.7, 325.2, 328.4, 331.7, 335.0, 338.4, 341.8, 345.2, 348.6, 352.1, 355.7, 359.2, 362.8],
+      lmeAvg:  [1701.8, 2475.5, 2707.0, 2251.6, 2300, 2200, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100],
+      lmeHigh: [null, null, null, null, 2500, 2400, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300],
+      lmeLow:  [null, null, null, null, 2100, 2000, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900],
+      premEU:  [129, 275, 484, 288, 294, 297, 300, 303, 306, 309, 312, 315, 318, 322, 325, 328],
+      premUS:  [13, 28, 41, 24, 26, 26, 27, 27, 27, 27, 28, 28, 28, 28, 29, 29],
+      premJP:  [84, 170, 126, 103, 121, 122, 123, 125, 126, 127, 128, 130, 131, 132, 134, 135],
+      greenLow:  [null, null, null, null, 20, 40, 60, 80, 90, 110, 130, 150, 170, 190, 210, 230],
+      greenHigh: [null, null, null, null, 30, 50, 70, 90, 100, 120, 140, 160, 180, 200, 220, 240]
+    };
+
+    const historical20YYears = [
+      2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+      2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023
+    ];
+    const historicalAl = [
+      1716.5, 1900.1, 2568.7, 2637.9, 2570.3, 1664.6, 2173.6, 2399.6, 2019.2, 1845.7,
+      1865.7, 1663.1, 1604.1, 1968.1, 2110.3, 1791.7, 1701.8, 2475.5, 2707.0, 2251.6
+    ];
+    const historicalCu = [
+      2868.3, 3684.6, 6716.8, 7115.9, 6947.7, 5152.0, 7539.9, 8825.2, 7948.8, 7328.0,
+      6859.9, 5501.7, 4863.2, 6162.8, 6526.8, 6005.1, 6168.6, 9314.7, 8814.8, 8483.4
+    ];
+
+    // =========================================================================
+    // CHART 1: PRICE & PREMIUM EXPLORER
+    // =========================================================================
+    let priceChartInstance = null;
+    let currentPriceMode = `lme`;
+
+    function setPriceChartMode(mode) {
+      currentPriceMode = mode;
+      const modes = [`lme`, `green`, `region`, `raw`, `copper`];
+      modes.forEach(function(m) {
+        const b = document.getElementById(`btn-chart-` + m);
+        if (b) {
+          if (m === mode) b.classList.add(`active`);
+          else b.classList.remove(`active`);
+        }
+      });
+      renderPriceChart(mode);
+    }
+
+    function renderPriceChart(mode) {
+      const canvas = document.getElementById(`priceForecastChart`);
+      if (!canvas) return;
+      const ctx = canvas.getContext(`2d`);
+      if (priceChartInstance) {
+        priceChartInstance.destroy();
+      }
+
+      const c1 = getToken(`--data-1`);
+      const c2 = getToken(`--data-2`);
+      const c3 = getToken(`--data-3`);
+      const c4 = getToken(`--data-4`);
+      const cCtx = getToken(`--data-context`);
+      const bandFill = getToken(`--band-fill`);
+      const goldBand = getToken(`--gold-band-fill`);
+      const gridColor = getToken(`--outline-variant`);
+      const textColor = getToken(`--on-surface-variant`);
+
+      const titleEl = document.getElementById(`price-chart-title`);
+      const subEl = document.getElementById(`price-chart-sub`);
+      const srcEl = document.getElementById(`price-chart-source`);
+
+      let config = null;
+
+      if (mode === `lme`) {
+        if (titleEl) titleEl.textContent = `LMEアルミ相場推移と2035年予測レンジ`;
+        if (subEl) subEl.textContent = `単位: USD/ton ｜ 2020–2023年実績、2024–2035年予測（ベースライン $2,200〜上振れ含み）`;
+        if (srcEl) srcEl.textContent = `出典: IRUNIVERSE / MIRU「LME アルミ市況 2035年予測」一覧表`;
+
+        config = {
+          type: `line`,
+          data: {
+            labels: forecastYears.map(function(y) { return y + `年`; }),
+            datasets: [
+              {
+                label: `予測高値 (High)`,
+                data: forecastData.lmeHigh,
+                borderColor: c2,
+                borderWidth: 1.5,
+                borderDash: [4, 4],
+                pointRadius: 2,
+                fill: false,
+                tension: 0.15
+              },
+              {
+                label: `LME平均相場 (Average)`,
+                data: forecastData.lmeAvg,
+                borderColor: c1,
+                backgroundColor: bandFill,
+                borderWidth: 3,
+                pointRadius: 3.5,
+                pointBackgroundColor: c1,
+                fill: false,
+                tension: 0.15
+              },
+              {
+                label: `予測安値 (Low)`,
+                data: forecastData.lmeLow,
+                borderColor: cCtx,
+                backgroundColor: bandFill,
+                borderWidth: 1.5,
+                borderDash: [4, 4],
+                pointRadius: 2,
+                fill: `-2`,
+                tension: 0.15
+              },
+              {
+                label: `長期ベースライン ($2,200)`,
+                data: forecastYears.map(function() { return 2200; }),
+                borderColor: c3,
+                borderWidth: 1.2,
+                borderDash: [2, 4],
+                pointRadius: 0,
+                fill: false
+              }
+            ]
+          },
+          options: baseChartOptions(`USD / ton`, textColor, gridColor, 1500)
+        };
+      } else if (mode === `green`) {
+        if (titleEl) titleEl.textContent = `グリーンプレミアム長期上昇予測（2024–2035年）`;
+        if (subEl) subEl.textContent = `単位: USD/ton ｜ 2024年 $20–30 → 2035年 $230–240（約10倍水準へ拡大）`;
+        if (srcEl) srcEl.textContent = `出典: IRUNIVERSE / MIRU「2035年市況予測」｜ スクラップ不足によるスクラッププレミアム加算も想定`;
+
+        const gYears = forecastYears.slice(4);
+        config = {
+          type: `line`,
+          data: {
+            labels: gYears.map(function(y) { return y + `年`; }),
+            datasets: [
+              {
+                label: `グリーンプレミアム上限 (USD/t)`,
+                data: forecastData.greenHigh.slice(4),
+                borderColor: c2,
+                backgroundColor: goldBand,
+                borderWidth: 2.5,
+                pointRadius: 4,
+                fill: false,
+                tension: 0.1
+              },
+              {
+                label: `グリーンプレミアム下限 (USD/t)`,
+                data: forecastData.greenLow.slice(4),
+                borderColor: c3,
+                backgroundColor: goldBand,
+                borderWidth: 2.5,
+                pointRadius: 4,
+                fill: `-1`,
+                tension: 0.1
+              }
+            ]
+          },
+          options: baseChartOptions(`USD / ton`, textColor, gridColor, 0)
+        };
+      } else if (mode === `region`) {
+        if (titleEl) titleEl.textContent = `地域別 新地金プレミアム予測（欧州・日本・米国）`;
+        if (subEl) subEl.textContent = `左軸: 欧州・日本 (USD/ton) ｜ 右軸: 米国 (cents/lb)`;
+        if (srcEl) srcEl.textContent = `出典: IRUNIVERSE / MIRU「2035年市況予測」｜ 紛争・供給網分断で地域プレミアムが高止まり`;
+
+        config = {
+          type: `line`,
+          data: {
+            labels: forecastYears.map(function(y) { return y + `年`; }),
+            datasets: [
+              {
+                label: `欧州プレミアム (USD/t)`,
+                data: forecastData.premEU,
+                borderColor: c1,
+                borderWidth: 2.5,
+                pointRadius: 3,
+                yAxisID: `y`,
+                tension: 0.15
+              },
+              {
+                label: `対日プレミアム (USD/t)`,
+                data: forecastData.premJP,
+                borderColor: c3,
+                borderWidth: 2.5,
+                pointRadius: 3,
+                yAxisID: `y`,
+                tension: 0.15
+              },
+              {
+                label: `米国プレミアム (cents/lb, 右軸)`,
+                data: forecastData.premUS,
+                borderColor: c2,
+                borderWidth: 2.5,
+                borderDash: [5, 3],
+                pointRadius: 3,
+                yAxisID: `y1`,
+                tension: 0.15
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: `index`, intersect: false },
+            plugins: {
+              legend: { position: `top`, labels: { boxWidth: 14, color: textColor, font: { size: 12 } } }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor } },
+              y: {
+                type: `linear`,
+                position: `left`,
+                beginAtZero: true,
+                title: { display: true, text: `欧州・日本 (USD/t)`, color: textColor },
+                grid: { color: gridColor },
+                ticks: { color: textColor }
+              },
+              y1: {
+                type: `linear`,
+                position: `right`,
+                beginAtZero: true,
+                title: { display: true, text: `米国 (cents/lb)`, color: textColor },
+                grid: { drawOnChartArea: false },
+                ticks: { color: textColor }
+              }
+            }
+          }
+        };
+      } else if (mode === `raw`) {
+        if (titleEl) titleEl.textContent = `アルミ原料（アルミナ・ボーキサイト）価格推移と予測`;
+        if (subEl) subEl.textContent = `左軸: 豪州産アルミナ FOB (USD/ton) ｜ 右軸: ギニア産ボーキサイト対中 (USD/dt)`;
+        if (srcEl) srcEl.textContent = `出典: IRUNIVERSE / MIRU「2035年市況予測」｜ ボーキサイトは年平均+1%上昇前提`;
+
+        config = {
+          type: `line`,
+          data: {
+            labels: forecastYears.map(function(y) { return y + `年`; }),
+            datasets: [
+              {
+                label: `アルミナ 豪州産FOB (USD/t)`,
+                data: forecastData.alumina,
+                borderColor: c1,
+                borderWidth: 2.5,
+                pointRadius: 3,
+                yAxisID: `y`,
+                tension: 0.15
+              },
+              {
+                label: `ボーキサイト ギニア産対中 (USD/dt, 右軸)`,
+                data: forecastData.bauxite,
+                borderColor: c2,
+                borderWidth: 2.5,
+                pointRadius: 3,
+                yAxisID: `y1`,
+                tension: 0.15
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: `index`, intersect: false },
+            plugins: {
+              legend: { position: `top`, labels: { boxWidth: 14, color: textColor, font: { size: 12 } } }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor } },
+              y: {
+                type: `linear`,
+                position: `left`,
+                min: 200,
+                title: { display: true, text: `アルミナ (USD/t)`, color: textColor },
+                grid: { color: gridColor },
+                ticks: { color: textColor }
+              },
+              y1: {
+                type: `linear`,
+                position: `right`,
+                min: 35,
+                title: { display: true, text: `ボーキサイト (USD/dt)`, color: textColor },
+                grid: { drawOnChartArea: false },
+                ticks: { color: textColor }
+              }
+            }
+          }
+        };
+      } else if (mode === `copper`) {
+        if (titleEl) titleEl.textContent = `過去20年間の年間平均価格比較：LMEアルミ vs LME銅（2004–2023）`;
+        if (subEl) subEl.textContent = `単位: USD/ton ｜ アルミは20年間で一度も年平均 $3,000 を超えず、銅に比べボラティリティが小さい`;
+        if (srcEl) srcEl.textContent = `出典: レポート第5章「2004年以降の20年間の価格推移」表`;
+
+        config = {
+          type: `line`,
+          data: {
+            labels: historical20YYears.map(function(y) { return y + `年`; }),
+            datasets: [
+              {
+                label: `LMEアルミ 年間平均 (USD/t)`,
+                data: historicalAl,
+                borderColor: c1,
+                borderWidth: 3,
+                pointRadius: 3,
+                tension: 0.15
+              },
+              {
+                label: `LME銅 年間平均 (USD/t)`,
+                data: historicalCu,
+                borderColor: c4,
+                borderWidth: 2,
+                borderDash: [4, 3],
+                pointRadius: 2.5,
+                tension: 0.15
+              },
+              {
+                label: `$3,000/t 参考ライン`,
+                data: historical20YYears.map(function() { return 3000; }),
+                borderColor: c2,
+                borderWidth: 1.5,
+                borderDash: [2, 4],
+                pointRadius: 0
+              }
+            ]
+          },
+          options: baseChartOptions(`USD / ton`, textColor, gridColor, 0)
+        };
+      }
+
+      priceChartInstance = new Chart(ctx, config);
+    }
+
+    function baseChartOptions(yTitle, textColor, gridColor, suggestedMin) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: `index`, intersect: false },
+        plugins: {
+          legend: { position: `top`, labels: { boxWidth: 14, color: textColor, font: { size: 12 } } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: textColor } },
+          y: {
+            suggestedMin: suggestedMin,
+            title: { display: true, text: yTitle, color: textColor },
+            grid: { color: gridColor },
+            ticks: { color: textColor }
+          }
+        }
+      };
+    }
+
+    // =========================================================================
+    // YEAR INSPECTOR & FULL FORECAST TABLE
+    // =========================================================================
+    function updateYearInspector(idxStr) {
+      const idx = parseInt(idxStr, 10);
+      if (isNaN(idx) || idx < 0 || idx >= forecastYears.length) return;
+      const yr = forecastYears[idx];
+      const isForecast = yr >= 2024;
+
+      const elYear = document.getElementById(`inspector-year-label`);
+      if (elYear) elYear.textContent = yr + `年` + (isForecast ? `（予測）` : `（実績）`);
+
+      const elLme = document.getElementById(`val-lme`);
+      if (elLme) {
+        if (isForecast) {
+          elLme.textContent = `$` + forecastData.lmeAvg[idx].toLocaleString() + ` ($` + forecastData.lmeLow[idx].toLocaleString() + `–$` + forecastData.lmeHigh[idx].toLocaleString() + `)`;
+        } else {
+          elLme.textContent = `$` + forecastData.lmeAvg[idx].toLocaleString() + `（年平均実績）`;
+        }
+      }
+
+      const elGreen = document.getElementById(`val-green`);
+      if (elGreen) {
+        elGreen.textContent = isForecast ? (`$` + forecastData.greenLow[idx] + `–` + forecastData.greenHigh[idx] + ` /t`) : `—（2024年より算出）`;
+      }
+
+      const elEu = document.getElementById(`val-eu`);
+      if (elEu) elEu.textContent = `$` + forecastData.premEU[idx] + ` /t`;
+
+      const elUs = document.getElementById(`val-us`);
+      if (elUs) elUs.textContent = forecastData.premUS[idx] + ` cents/lb`;
+
+      const elJp = document.getElementById(`val-jp`);
+      if (elJp) elJp.textContent = `$` + forecastData.premJP[idx] + ` /t`;
+
+      const elAlu = document.getElementById(`val-alumina`);
+      if (elAlu) elAlu.textContent = `$` + forecastData.alumina[idx] + ` /t`;
+
+      const elBaux = document.getElementById(`val-bauxite`);
+      if (elBaux) elBaux.textContent = `$` + forecastData.bauxite[idx] + ` /dt`;
+
+      const elNote = document.getElementById(`inspector-note`);
+      if (elNote) {
+        if (yr <= 2023) {
+          elNote.textContent = yr === 2022
+            ? `2022年はロシアのウクライナ侵攻を受け3月にLME史上最高値$3,984.5/tを記録、年平均$2,707・欧州プレミアム$484/tへ急騰しました。`
+            : `2020–2023年はコロナ禍の低迷から急騰を経て、欧米の高金利政策と中国減速で2023年は年平均$2,251.6へ調整した期間です。`;
+        } else if (yr <= 2026) {
+          elNote.textContent = `2024–2026年は米金利動向や中国不動産不況の余波でLME平均$2,200–$2,300圏の抑制基調ですが、グリーンプレミアムは$20–30から$60–70へ倍増基調に入ります。`;
+        } else if (yr <= 2030) {
+          elNote.textContent = `2027–2030年は世界需給が1億2,000万トン台へ到達する節目。EU CBAM課税本格化やスクラップ流通制約を背景にLME平均$2,300→$2,600、グリーンプレミアム$130–140/tへ上昇。`;
+        } else {
+          elNote.textContent = `2031–2035年は中国ピークアウト後のグローバルサウス牽引期。新地金供給余力の一方でサプライチェーン分断とスクラップ争奪が効き、2035年はLME平均$3,100・グリーンプレミアム$230–240/tを見込みます。`;
+        }
+      }
+
+      // Highlight table column if open
+      const slider = document.getElementById(`year-slider`);
+      if (slider && slider.value !== String(idx)) slider.value = String(idx);
+    }
+
+    function buildForecastTable() {
+      const tbody = document.getElementById(`forecast-table-body`);
+      if (!tbody) return;
+      const rows = [
+        { label: `ボーキサイト (USD/dt)`, arr: forecastData.bauxite },
+        { label: `アルミナ (USD/t)`, arr: forecastData.alumina },
+        { label: `LME相場 高値 (USD/t)`, arr: forecastData.lmeHigh },
+        { label: `LME相場 平均 (USD/t)`, arr: forecastData.lmeAvg },
+        { label: `LME相場 安値 (USD/t)`, arr: forecastData.lmeLow },
+        { label: `新地金プレミアム 欧州 (USD/t)`, arr: forecastData.premEU },
+        { label: `新地金プレミアム 米国 (cents/lb)`, arr: forecastData.premUS },
+        { label: `新地金プレミアム 日本 (USD/t)`, arr: forecastData.premJP },
+        { label: `グリーンプレミアム (USD/t)`, arr: forecastYears.map(function(y, i) {
+          return y >= 2024 ? (forecastData.greenLow[i] + `–` + forecastData.greenHigh[i]) : null;
+        }) }
+      ];
+      tbody.innerHTML = rows.map(function(r) {
+        const cells = r.arr.map(function(v, idx) {
+          const txt = (v === null || v === undefined) ? `—` : (typeof v === `number` ? v.toLocaleString() : v);
+          return `<td onclick="updateYearInspector(${idx})">${txt}</td>`;
+        }).join(``);
+        return `<tr><td>${r.label}</td>${cells}</tr>`;
+      }).join(``);
+    }
+
+    // =========================================================================
+    // CHART 2: SUPPLY-DEMAND BALANCE & RECYCLING
+    // =========================================================================
+    let sdChartInstance = null;
+    let resChartInstance = null;
+
+    function setSupplyChartMode(mode) {
+      [`iea`, `inst`, `prod`].forEach(function(m) {
+        const b = document.getElementById(`btn-sd-` + m);
+        if (b) {
+          if (m === mode) b.classList.add(`active`);
+          else b.classList.remove(`active`);
+        }
+      });
+      renderSupplyChart(mode);
+    }
+
+    function renderSupplyChart(mode) {
+      const canvas = document.getElementById(`supplyDemandChart`);
+      if (!canvas) return;
+      const ctx = canvas.getContext(`2d`);
+      if (sdChartInstance) sdChartInstance.destroy();
+
+      const c1 = getToken(`--data-1`);
+      const c2 = getToken(`--data-2`);
+      const c3 = getToken(`--data-3`);
+      const c4 = getToken(`--data-4`);
+      const cCtx = getToken(`--data-context`);
+      const gridColor = getToken(`--outline-variant`);
+      const textColor = getToken(`--on-surface-variant`);
+
+      const titleEl = document.getElementById(`sd-chart-title`);
+      const subEl = document.getElementById(`sd-chart-sub`);
+      const srcEl = document.getElementById(`sd-chart-source`);
+
+      if (mode === `iea`) {
+        if (titleEl) titleEl.textContent = `IEA アルミニウム生産予測（新地金と再生地金の内訳）`;
+        if (subEl) subEl.textContent = `単位: 百万トン ｜ 再生地金シェアは2022年 36% → 2035年 44% → 2050年 56%へ拡大`;
+        if (srcEl) srcEl.textContent = `出典: IEA「Net Zero Roadmap 2023 Update」を基にMIRU作成`;
+
+        sdChartInstance = new Chart(ctx, {
+          type: `bar`,
+          data: {
+            labels: [`2022年`, `2030年`, `2035年`, `2050年`],
+            datasets: [
+              {
+                label: `新地金（ボーキサイト由来, 百万t）`,
+                data: [69.12, 69.60, 71.68, 64.24],
+                backgroundColor: c1
+              },
+              {
+                label: `再生地金（スクラップ由来, 百万t）`,
+                data: [38.88, 50.40, 56.32, 81.76],
+                backgroundColor: c3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: `top`, labels: { color: textColor } } },
+            scales: {
+              x: { stacked: true, grid: { display: false }, ticks: { color: textColor } },
+              y: { stacked: true, beginAtZero: true, title: { display: true, text: `百万トン (Mt)`, color: textColor }, grid: { color: gridColor }, ticks: { color: textColor } }
+            }
+          }
+        });
+      } else if (mode === `inst`) {
+        if (titleEl) titleEl.textContent = `主要機関の長期需給予測比較（需要 vs 供給）`;
+        if (subEl) subEl.textContent = `単位: 百万トン ｜ 2030年は+50万t、2050年は約+500万tの供給超過パターン`;
+        if (srcEl) srcEl.textContent = `出典: IEA / IAI / 日本アルミニウム協会 / 豪産業科学資源省`;
+
+        sdChartInstance = new Chart(ctx, {
+          type: `bar`,
+          data: {
+            labels: [`2022年(豪)`, `2028年(豪)`, `2030年(IAI需要 vs IEA供給)`, `2035年(IEA供給)`, `2050年(アル協需要 vs IEA供給)`],
+            datasets: [
+              {
+                label: `世界需要予測 (百万t)`,
+                data: [94.0, 112.0, 119.5, null, 140.77],
+                backgroundColor: c2
+              },
+              {
+                label: `世界供給予測 (百万t)`,
+                data: [102.0, 122.0, 120.0, 128.0, 146.0],
+                backgroundColor: c1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: `top`, labels: { color: textColor } } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor, font: { size: 11 } } },
+              y: { beginAtZero: true, title: { display: true, text: `百万トン (Mt)`, color: textColor }, grid: { color: gridColor }, ticks: { color: textColor } }
+            }
+          }
+        });
+      } else if (mode === `prod`) {
+        if (titleEl) titleEl.textContent = `2023年 世界アルミ新地金の地域別生産量（総計7,058.1万トン）`;
+        if (subEl) subEl.textContent = `単位: 千トン ｜ 中国が4,166.6万トン（世界シェア59%）を占め一極集中`;
+        if (srcEl) srcEl.textContent = `出典: IAI「Primary Aluminium Production 2023」`;
+
+        sdChartInstance = new Chart(ctx, {
+          type: `bar`,
+          data: {
+            labels: [`中国 (59%)`, `GCC湾岸諸国`, `アジア(中除)`, `ロシア・東欧`, `北米`, `西・中欧`, `IAI未報告推定`, `オセアニア`, `アフリカ`, `南米`],
+            datasets: [{
+              label: `2023年新地金生産量 (千トン)`,
+              data: [41666, 6217, 4673, 4016, 3897, 2713, 2455, 1884, 1594, 1466],
+              backgroundColor: [c1, c2, c3, c4, c1, cCtx, cCtx, cCtx, cCtx, cCtx]
+            }]
+          },
+          options: {
+            indexAxis: `y`,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+              y: { grid: { display: false }, ticks: { color: textColor } }
+            }
+          }
+        });
+      }
+    }
+
+    function setResourceChartMode(mode) {
+      [`scrap`, `bauxite`].forEach(function(m) {
+        const b = document.getElementById(`btn-res-` + m);
+        if (b) {
+          if (m === mode) b.classList.add(`active`);
+          else b.classList.remove(`active`);
+        }
+      });
+      renderResourceChart(mode);
+    }
+
+    function renderResourceChart(mode) {
+      const canvas = document.getElementById(`resourceChart`);
+      if (!canvas) return;
+      const ctx = canvas.getContext(`2d`);
+      if (resChartInstance) resChartInstance.destroy();
+
+      const c1 = getToken(`--data-1`);
+      const c2 = getToken(`--data-2`);
+      const c3 = getToken(`--data-3`);
+      const gridColor = getToken(`--outline-variant`);
+      const textColor = getToken(`--on-surface-variant`);
+
+      const titleEl = document.getElementById(`res-chart-title`);
+      const subEl = document.getElementById(`res-chart-sub`);
+      const srcEl = document.getElementById(`res-chart-source`);
+
+      if (mode === `scrap`) {
+        if (titleEl) titleEl.textContent = `主要国・地域のアルミスクラップ推定流通量（2022→2030年）`;
+        if (subEl) subEl.textContent = `単位: 万トン ｜ 中国はCAGR 10.5%で1,500万tへ、アフリカ・インド・ASEANも急伸`;
+        if (srcEl) srcEl.textContent = `出典: MIRU各国のスクラップ発生量・二次合金出荷量より推定`;
+
+        resChartInstance = new Chart(ctx, {
+          type: `bar`,
+          data: {
+            labels: [`中国`, `米国`, `EU`, `アフリカ`, `インド`, `日本`, `オセアニア`, `マレーシア`, `インドネシア`],
+            datasets: [
+              {
+                label: `現在（2022年頃, 万t）`,
+                data: [1000, 800, 600, 50, 50, 150, 50, 40, 1],
+                backgroundColor: c1
+              },
+              {
+                label: `2030年予測（万t）`,
+                data: [1500, 900, 700, 200, 150, 150, 80, 80, 50],
+                backgroundColor: c3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: `top`, labels: { color: textColor } } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor } },
+              y: { beginAtZero: true, title: { display: true, text: `万トン`, color: textColor }, grid: { color: gridColor }, ticks: { color: textColor } }
+            }
+          }
+        });
+      } else if (mode === `bauxite`) {
+        if (titleEl) titleEl.textContent = `世界のボーキサイト埋蔵量・生産量上位国（USGS 2023年公表）`;
+        if (subEl) subEl.textContent = `左軸: 埋蔵量（百万トン）｜ 右軸: 2022年生産量（百万トン）`;
+        if (srcEl) srcEl.textContent = `出典: USGS Mineral Commodity Summaries 2023（世界総埋蔵量 310億t、生産 3.8億t）`;
+
+        resChartInstance = new Chart(ctx, {
+          type: `bar`,
+          data: {
+            labels: [`ギニア`, `ベトナム`, `オーストラリア`, `ブラジル`, `ジャマイカ`, `インドネシア`, `中国`, `インド`],
+            datasets: [
+              {
+                label: `埋蔵量 (百万t)`,
+                data: [7400, 5800, 5100, 2700, 2000, 1000, 710, 660],
+                backgroundColor: c1,
+                yAxisID: `y`
+              },
+              {
+                label: `2022年生産量 (百万t, 右軸)`,
+                data: [86, 3.8, 100, 33, 3.9, 21, 90, 17],
+                backgroundColor: c2,
+                yAxisID: `y1`
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: `top`, labels: { color: textColor } } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor } },
+              y: { beginAtZero: true, title: { display: true, text: `埋蔵量 (百万t)`, color: textColor }, grid: { color: gridColor }, ticks: { color: textColor } },
+              y1: { beginAtZero: true, position: `right`, title: { display: true, text: `2022生産量 (百万t)`, color: textColor }, grid: { drawOnChartArea: false }, ticks: { color: textColor } }
+            }
+          }
+        });
+      }
+    }
+
+    // =========================================================================
+    // CHART 3: SECTOR DEMAND (2020-2035) & SIMULATOR
+    // =========================================================================
+    function renderSectorDemandChart() {
+      const canvas = document.getElementById(`sectorDemandChart`);
+      if (!canvas) return;
+      const ctx = canvas.getContext(`2d`);
+
+      const c1 = getToken(`--data-1`);
+      const c2 = getToken(`--data-2`);
+      const c3 = getToken(`--data-3`);
+      const c4 = getToken(`--data-4`);
+      const gridColor = getToken(`--outline-variant`);
+      const textColor = getToken(`--on-surface-variant`);
+
+      const autoArr = [14830, 16717, 17176, 18102, 18969, 20032, 20852, 21478, 22122, 22122, 22122, 22122, 22122, 22122, 22122, 22122];
+      const constArr = [15683, 15560, 15560, 16397, 14800, 14714, 14761, 14894, 15341, 15801, 16275, 16763, 17266, 17784, 18318, 18867];
+      const powerArr = [8391, 9257, 9902, 11711, 12510, 13365, 14275, 14561, 14852, 15149, 15452, 15761, 16076, 16397, 16725, 17060];
+      const packArr = [5221, 5824, 6088, 5735, 5869, 6002, 6088, 6380, 6508, 6638, 6771, 6906, 7044, 7185, 7329, 7625];
+
+      new Chart(ctx, {
+        type: `line`,
+        data: {
+          labels: forecastYears.map(function(y) { return y + `年`; }),
+          datasets: [
+            { label: `自動車`, data: autoArr, borderColor: c1, borderWidth: 3, pointRadius: 2.5, tension: 0.15 },
+            { label: `建設`, data: constArr, borderColor: c2, borderWidth: 2.5, pointRadius: 2.5, tension: 0.15 },
+            { label: `電力・再エネ`, data: powerArr, borderColor: c3, borderWidth: 2.5, pointRadius: 2.5, tension: 0.15 },
+            { label: `容器包装`, data: packArr, borderColor: c4, borderWidth: 2, pointRadius: 2, tension: 0.15 }
+          ]
+        },
+        options: baseChartOptions(`需要量 (千トン)`, textColor, gridColor, 4000)
+      });
+    }
+
+    const sectorDetails = {
+      auto: {
+        badge: `SECTOR 01`,
+        tag: `2020→2035年: 14,830 → 22,122千トン`,
+        title: `自動車：EV・ギガキャストが鉄鋼からの代替を加速`,
+        body: `車1台当たりのアルミ使用量は2020年の170kgから2030年には250kgへ増加見通し。ギガキャスト導入車種では1台当たり150〜250kg追加され最大450kgに達します。豪産業科学資源省はEV販売台数が2022年1,070万台→2028年3,000万台、EV用アルミ使用量が270万t→760万tへ拡大すると試算。一方、先進国の人口減少や中国・EUのEV補助金終了・HEV（ハイブリッド）回帰による一時的踊り場にも留意が必要です。`
+      },
+      power: {
+        badge: `SECTOR 02`,
+        tag: `2020→2035年: 8,391 → 17,060千トン（倍増超）`,
+        title: `電力・再エネ：太陽光発電倍増と銅線からの代替需要`,
+        body: `太陽光発電の新設容量は2021年の167.8GW/年から2026年に350.0GW/年へ拡大予定。効率化により1MW当たりのアルミ使用量は24.2MT(2023年)→19.4MT(2025年)へ減少するものの、中国・インドの再エネ投資がそれを上回り年6%超の伸びが続きます。さらに銅価格高騰による世界的な太陽光発電所の銅線盗難多発を受け、アルミケーブルへの代替需要も想定されています。`
+      },
+      const: {
+        badge: `SECTOR 03`,
+        tag: `2020→2035年: 15,683 → 18,867千トン`,
+        title: `建設・インフラ：中国不動産不況をグローバルサウスが補完`,
+        body: `高金利と中国の不動産不況（恒大問題）の回復に時間を要するため、2024年は前年比1.2%減と一時調整。しかし、インド・インドネシアなどの政府インフラ投資や都市部の住宅建設が先進国・中国の減速を補い、住宅での再生アルミ材採用拡大も相まって2026年以降は年率3%の安定成長で1,500万トン超の規模を維持・拡大する見通しです。`
+      },
+      pack: {
+        badge: `SECTOR 04`,
+        tag: `2020→2035年: 5,221 → 7,625千トン`,
+        title: `容器包装：国際プラスチック条約がアルミ缶シフトを後押し`,
+        body: `2023年は消費意欲減退で573.5万トン（資料ベース530万t水準の低迷）にとどまりましたが、2024年以降の個人消費回復とともに拡大へ。ペットボトルは「ボトルtoボトル」を繰り返すと変色するリサイクル上の限界があり、国際プラスチック条約の制定議論や先進国の100%リサイクル缶需要・新興国経済成長により、2026年以降も年2%の堅調な増加が見込まれます。`
+      }
+    };
+
+    function selectSector(key) {
+      [`auto`, `power`, `const`, `pack`].forEach(function(k) {
+        const b = document.getElementById(`sec-btn-` + k);
+        if (b) {
+          if (k === key) b.classList.add(`active`);
+          else b.classList.remove(`active`);
+        }
+      });
+      const d = sectorDetails[key];
+      if (!d) return;
+      const bEl = document.getElementById(`sector-badge`);
+      const tEl = document.getElementById(`sector-growth-tag`);
+      const hEl = document.getElementById(`sector-detail-title`);
+      const pEl = document.getElementById(`sector-detail-body`);
+      if (bEl) bEl.textContent = d.badge;
+      if (tEl) tEl.textContent = d.tag;
+      if (hEl) hEl.textContent = d.title;
+      if (pEl) pEl.textContent = d.body;
+    }
+
+    function applyAutoPreset(salesWan, kgPerCar) {
+      const sEl = document.getElementById(`input-auto-sales`);
+      const kEl = document.getElementById(`input-auto-kg`);
+      if (sEl) sEl.value = salesWan;
+      if (kEl) kEl.value = kgPerCar;
+      computeAutoDemand();
+    }
+
+    function syncAutoFromNumber() {
+      computeAutoDemand();
+    }
+
+    function computeAutoDemand() {
+      const sEl = document.getElementById(`input-auto-sales`);
+      const kEl = document.getElementById(`input-auto-kg`);
+      if (!sEl || !kEl) return;
+      const salesWan = Math.max(0, parseFloat(sEl.value) || 0);
+      const kg = Math.max(0, parseFloat(kEl.value) || 0);
+      // salesWan * 10,000 cars * kg / 1000 = tonnes; / 10,000 = 万トン => salesWan * kg / 1000
+      const demandWanTon = Math.round((salesWan * kg) / 1000);
+      const base2023 = 1810; // 18,102千t = 1,810万t
+      const diff = demandWanTon - base2023;
+      const pct = ((diff / base2023) * 100).toFixed(1);
+
+      const outEl = document.getElementById(`sim-auto-output`);
+      const deltaEl = document.getElementById(`sim-auto-delta`);
+      if (outEl) outEl.textContent = demandWanTon.toLocaleString() + `万トン`;
+      if (deltaEl) {
+        const sign = diff >= 0 ? `+` : ``;
+        deltaEl.textContent = sign + diff.toLocaleString() + `万トン (` + sign + pct + `%)`;
+        deltaEl.style.color = diff >= 0 ? getToken(`--positive`) : getToken(`--error`);
+      }
+    }
+
+    // =========================================================================
+    // CHART 4: POWER MIX DOUGHNUT
+    // =========================================================================
+    function renderPowerMixChart() {
+      const canvas = document.getElementById(`powerMixChart`);
+      if (!canvas) return;
+      const ctx = canvas.getContext(`2d`);
+
+      new Chart(ctx, {
+        type: `doughnut`,
+        data: {
+          labels: [`石炭 56%`, `水力 32%`, `ガス 9%`, `その他 2%`, `原子力 1%`],
+          datasets: [{
+            data: [56, 32, 9, 2, 1],
+            backgroundColor: [
+              getToken(`--data-4`),
+              getToken(`--data-1`),
+              getToken(`--data-2`),
+              getToken(`--data-context`),
+              getToken(`--data-3`)
+            ],
+            borderWidth: 2,
+            borderColor: getToken(`--surface-container-low`)
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: `right`, labels: { boxWidth: 12, color: getToken(`--on-surface`), font: { size: 12 } } }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // SECTION 05: BULL / BEAR FACTORS MATRIX
+    // =========================================================================
+    const marketFactors = [
+      {
+        polarity: `bull`,
+        category: `需給・脱炭素`,
+        title: `脱炭素を映したアルミ需要の持続的拡大`,
+        body: `自動車の軽量化・EV化、太陽光発電設備・送電線、PETからの脱プラ飲料容器など多面的な需要増。世界の銅高止まりによるアルミケーブル代替や投機筋の関心移動も追い風。`,
+        stat: `2030年需要: IAI予測 1億1,950万t (+40%)`
+      },
+      {
+        polarity: `bull`,
+        category: `地政学・規制`,
+        title: `欧米による重要鉱物の囲い込みとスクラップ規制`,
+        body: `米国はエネルギー法・IRAでアルミを重要鉱物指定。EUも重要原材料法（域内加工40%・リサイクル25%）に加え、改正廃棄物輸送規則でスクラップの域外流出を厳格制限。`,
+        stat: `米国プレミアム ~$420/t ｜ EU単一国依存上限 65%`
+      },
+      {
+        polarity: `bull`,
+        category: `地政学・規制`,
+        title: `中国の4,500万トンCAP制と生産拠点再配置`,
+        body: `2025年に国内生産4,300万tと上限4,500万tに接近。石炭依存から水力豊富な雲南省（約570万t・12%）へ移転するも、毎年の乾季（11〜4月）の渇水による減産リスクを内包。`,
+        stat: `2023年雲南渇水減産: 約140万t`
+      },
+      {
+        polarity: `bull`,
+        category: `需給・脱炭素`,
+        title: `国際プラスチック条約制定に向けた脱プラ加速`,
+        body: `ペットボトルの「ボトルtoボトル」は変色等の品質限界があり、無制限のリサイクル循環が困難。条約制定の動きは飲料容器のアルミ缶シフトを加速させる強材料。`,
+        stat: `世界のプラ廃棄リサイクル率は9%にとどまる（環境省）`
+      },
+      {
+        polarity: `bull`,
+        category: `地政学・規制`,
+        title: `資源ナショナリズムの高まりと川上・川下争奪`,
+        body: `インドネシアの2023年6月ボーキサイト禁輸、ギニア対中債務30%・Sangaredi鉱山への中国資本関与、UAEのリサイクル連合など、資源国の囲い込みとブロック化が進行。`,
+        stat: `ギニア埋蔵量 74億t（世界23%）・中国の輸入56%依存`
+      },
+      {
+        polarity: `bull`,
+        category: `地政学・規制`,
+        title: `継続的な地政学リスクとLME在庫の逼迫シグナル`,
+        body: `ウクライナ侵攻後にロシア産が中国・LME倉庫へ集中し、紅海危機が海運市況を直撃。LME在庫に占めるキャンセルワラント比率は40%超と、銅（18%）を大きく上回る。`,
+        stat: `中国輸入の露産比率 5.8%→83% ｜ LME在庫露産 76%`
+      },
+      {
+        polarity: `bear`,
+        category: `需給・脱炭素`,
+        title: `EVシフトの一巡・踊り場とHEV回帰`,
+        body: `中国・EUでのEV補助金終了や充電インフラ整備遅れ、高価格帯一巡により、消費者がハイブリッド車（HEV）へ回帰。欧州VWや米国フォードのEV減産がアルミ採用ペースを緩める懸念。`,
+        stat: `EU 2023年販売比率: BEV 14.6% vs HEV 25.8%`
+      },
+      {
+        polarity: `bear`,
+        category: `需給・脱炭素`,
+        title: `スクラップ由来の再生アルミ利用拡大`,
+        body: `地球上に存在する15〜16億台の自動車はいずれスクラップとして生産へ還流。再生アルミ原料は潤沢であり、長期的には鉛（供給70%リサイクル）同様、原料不足による継続的高騰を抑制。`,
+        stat: `IEA 2035年再生シェア 44% → 2050年 56%`
+      },
+      {
+        polarity: `bear`,
+        category: `需給・脱炭素`,
+        title: `相場上昇と中国資本の海外進出による供給増加`,
+        body: `国内上限に直面した中国資本がインドネシア等で50万t級の新規製錬所（Huaqing, Bintan, Adaro Kalimantan等）を計画。ニッケル相場が供給超過で2.5万→1.6万ドルへ低迷した前例と重なる。`,
+        stat: `豪省2028年予測: 供給1億2,200万t（+1,000万t供給超）`
+      },
+      {
+        polarity: `bear`,
+        category: `マクロ・政治`,
+        title: `生産年齢人口減少と中国「人口オーナス期」突入`,
+        body: `中国や東アジア・ASEANの一部で少子高齢化が急速に進行。1人当たりGDPが十分に高まる前に成長の重荷となる人口オーナス期に入り、2030年以降の中国消費は減少・横ばい見通し。`,
+        stat: `日アル協: 中国需要は2030年5,300万tでピークアウト`
+      },
+      {
+        polarity: `bear`,
+        category: `マクロ・政治`,
+        title: `米大統領選・トランプ氏返り咲きによる政策逆回転`,
+        body: `IRAのEV税額控除撤廃など気候変動対策の逆回転は懸念材料。ただしラストベルト雇用への配慮や、パウエルFRB議長任期（2026年5月）までの標準的な利下げ継続から、影響は「若干の弱材料」にとどまる見立て。`,
+        stat: `FRB議長任期 2026年5月まで（市場は事前に織込み済み）`
+      }
+    ];
+
+    let currentPolarity = `all`;
+    let currentCategory = `all`;
+
+    function setFactorFilter(polarity, category) {
+      currentPolarity = polarity;
+      currentCategory = category;
+
+      [`all`, `bull`, `bear`].forEach(function(p) {
+        const b = document.getElementById(`flt-` + p);
+        if (b) {
+          if (p === polarity) b.classList.add(`active`);
+          else b.classList.remove(`active`);
+        }
+      });
+
+      const catMap = {
+        all: `cat-all`,
+        '需給・脱炭素': `cat-demand`,
+        '地政学・規制': `cat-geo`,
+        'マクロ・政治': `cat-macro`
+      };
+      Object.keys(catMap).forEach(function(k) {
+        const b = document.getElementById(catMap[k]);
+        if (b) {
+          if (k === category) b.classList.add(`active`);
+          else b.classList.remove(`active`);
+        }
+      });
+
+      renderFactorGrid();
+    }
+
+    function renderFactorGrid() {
+      const grid = document.getElementById(`factor-grid`);
+      if (!grid) return;
+
+      const filtered = marketFactors.filter(function(f) {
+        const matchPol = currentPolarity === `all` || f.polarity === currentPolarity;
+        const matchCat = currentCategory === `all` || f.category === currentCategory;
+        return matchPol && matchCat;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="figure-card"><p style="margin:0;color:var(--on-surface-variant);">該当する材料がありません。フィルター条件を「すべて」に戻してください。</p></div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(function(f) {
+        const polLabel = f.polarity === `bull` ? `強材料 [BULL]` : `弱材料 [BEAR]`;
+        return `
+          <article class="factor-card ${f.polarity}">
+            <div class="factor-head">
+              <span class="polarity-badge ${f.polarity}">${polLabel}</span>
+              <span class="cat-tag">${f.category}</span>
+            </div>
+            <h3 class="factor-title">${f.title}</h3>
+            <p class="factor-body">${f.body}</p>
+            <div class="factor-stat">${f.stat}</div>
+          </article>
+        `;
+      }).join(``);
+    }
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    function initDashboard() {
+      renderPriceChart(`lme`);
+      updateYearInspector(15);
+      buildForecastTable();
+      renderSupplyChart(`iea`);
+      renderResourceChart(`scrap`);
+      renderSectorDemandChart();
+      computeAutoDemand();
+      renderPowerMixChart();
+      renderFactorGrid();
+    }
+
+    if (document.readyState === `loading`) {
+      document.addEventListener(`DOMContentLoaded`, initDashboard);
+    } else {
+      initDashboard();
+    }
+  </script>
+</body>
+</html>
